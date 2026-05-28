@@ -1,0 +1,17 @@
+# 仅包含非敏感默认值，可提交到 Git。
+# 数据库、密钥、OSS 等敏感项请通过 .env 环境变量注入。
+
+server:
+  host: "0.0.0.0"
+  port: 50051
+
+jwt:
+  expire_hours: 72
+
+oss:
+  upload_expire_seconds: 900
+  download_expire_seconds: 300
+
+dashscope:
+  base_url: "https://dashscope.aliyuncs.com/compatible-mode/v1"
+  model: "qwen-plus"

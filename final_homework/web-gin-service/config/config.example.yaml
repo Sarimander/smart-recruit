@@ -1,0 +1,14 @@
+# 仅包含非敏感默认值，可提交到 Git。
+# JWT 等敏感项请通过 .env 环境变量注入。
+
+server:
+  host: "0.0.0.0"
+  port: 8080
+
+logic_grpc:
+  address: "127.0.0.1:50051"
+
+cors:
+  allow_origins:
+    - "http://localhost:5173"
+    - "http://localhost:5174"

@@ -1,0 +1,265 @@
+syntax = "proto3";
+
+package recruit.v1;
+
+option go_package = "logic-grpc-service/proto/gen/recruit/v1;recruitv1";
+
+// ========== Common ==========
+
+message Empty {}
+
+message Pagination {
+  int32 page = 1;
+  int32 page_size = 2;
+}
+
+message PageInfo {
+  int32 page = 1;
+  int32 page_size = 2;
+  int64 total = 3;
+}
+
+// ========== Auth ==========
+
+message RegisterRequest {
+  string username = 1;
+  string password = 2;
+  string role = 3; // hr | candidate
+}
+
+message LoginRequest {
+  string username = 1;
+  string password = 2;
+}
+
+message AuthResponse {
+  string token = 1;
+  int64 user_id = 2;
+  string username = 3;
+  string role = 4;
+}
+
+message GetUserRequest {
+  int64 user_id = 1;
+}
+
+message UserInfo {
+  int64 id = 1;
+  string username = 2;
+  string role = 3;
+}
+
+service AuthService {
+  rpc Register(RegisterRequest) returns (AuthResponse);
+  rpc Login(LoginRequest) returns (AuthResponse);
+  rpc GetUser(GetUserRequest) returns (UserInfo);
+}
+
+// ========== Job ==========
+
+message Job {
+  int64 id = 1;
+  int64 hr_id = 2;
+  string title = 3;
+  string description = 4;
+  string salary = 5;
+  string location = 6;
+  string status = 7;
+  string created_at = 8;
+  string hr_username = 9;
+}
+
+message CreateJobRequest {
+  int64 hr_id = 1;
+  string title = 2;
+  string description = 3;
+  string salary = 4;
+  string location = 5;
+}
+
+message UpdateJobRequest {
+  int64 hr_id = 1;
+  int64 job_id = 2;
+  string title = 3;
+  string description = 4;
+  string salary = 5;
+  string location = 6;
+  string status = 7;
+}
+
+message DeleteJobRequest {
+  int64 hr_id = 1;
+  int64 job_id = 2;
+}
+
+message GetJobRequest {
+  int64 job_id = 1;
+}
+
+message ListJobsRequest {
+  Pagination pagination = 1;
+  string status = 2;
+}
+
+message ListHRJobsRequest {
+  int64 hr_id = 1;
+  Pagination pagination = 2;
+}
+
+message JobListResponse {
+  repeated Job jobs = 1;
+  PageInfo page_info = 2;
+}
+
+message JobResponse {
+  Job job = 1;
+}
+
+service JobService {
+  rpc CreateJob(CreateJobRequest) returns (JobResponse);
+  rpc UpdateJob(UpdateJobRequest) returns (JobResponse);
+  rpc DeleteJob(DeleteJobRequest) returns (Empty);
+  rpc GetJob(GetJobRequest) returns (JobResponse);
+  rpc ListPublicJobs(ListJobsRequest) returns (JobListResponse);
+  rpc ListHRJobs(ListHRJobsRequest) returns (JobListResponse);
+}
+
+// ========== Candidate Profile ==========
+
+message CandidateProfile {
+  int64 user_id = 1;
+  string name = 2;
+  string phone = 3;
+  string education = 4;
+  string school = 5;
+  string experience = 6;
+  string skills = 7;
+  string resume_oss_key = 8;
+  bool profile_complete = 9;
+}
+
+message GetProfileRequest {
+  int64 user_id = 1;
+}
+
+message UpdateProfileRequest {
+  int64 user_id = 1;
+  string name = 2;
+  string phone = 3;
+  string education = 4;
+  string school = 5;
+  string experience = 6;
+  string skills = 7;
+}
+
+message UpdateResumeRequest {
+  int64 user_id = 1;
+  string oss_key = 2;
+}
+
+message ProfileResponse {
+  CandidateProfile profile = 1;
+}
+
+service CandidateService {
+  rpc GetProfile(GetProfileRequest) returns (ProfileResponse);
+  rpc UpdateProfile(UpdateProfileRequest) returns (ProfileResponse);
+  rpc UpdateResume(UpdateResumeRequest) returns (ProfileResponse);
+}
+
+// ========== Application ==========
+
+message Application {
+  int64 id = 1;
+  int64 job_id = 2;
+  int64 candidate_id = 3;
+  string status = 4;
+  string applied_at = 5;
+  string job_title = 6;
+  CandidateProfile candidate = 7;
+}
+
+message ApplyRequest {
+  int64 candidate_id = 1;
+  int64 job_id = 2;
+}
+
+message ListHRCandidatesRequest {
+  int64 hr_id = 1;
+  Pagination pagination = 2;
+  int64 job_id = 3;
+}
+
+message ApplicationListResponse {
+  repeated Application applications = 1;
+  PageInfo page_info = 2;
+}
+
+message ApplicationResponse {
+  Application application = 1;
+}
+
+service ApplicationService {
+  rpc Apply(ApplyRequest) returns (ApplicationResponse);
+  rpc ListHRCandidates(ListHRCandidatesRequest) returns (ApplicationListResponse);
+}
+
+// ========== OSS ==========
+
+message GetUploadURLRequest {
+  int64 user_id = 1;
+  string filename = 2;
+}
+
+message GetUploadURLResponse {
+  string upload_url = 1;
+  string oss_key = 2;
+  int64 expire_seconds = 3;
+}
+
+message GetDownloadURLRequest {
+  int64 hr_id = 1;
+  string oss_key = 2;
+  int64 candidate_id = 3;
+}
+
+message GetDownloadURLResponse {
+  string download_url = 1;
+  int64 expire_seconds = 2;
+}
+
+service OSSService {
+  rpc GetUploadURL(GetUploadURLRequest) returns (GetUploadURLResponse);
+  rpc GetDownloadURL(GetDownloadURLRequest) returns (GetDownloadURLResponse);
+}
+
+// ========== AI ==========
+
+message ChatRequest {
+  int64 hr_id = 1;
+  string message = 2;
+}
+
+message ChatResponse {
+  string reply = 1;
+}
+
+message ChatMessage {
+  int64 id = 1;
+  string role = 2;
+  string content = 3;
+  string created_at = 4;
+}
+
+message GetChatHistoryRequest {
+  int64 hr_id = 1;
+}
+
+message ChatHistoryResponse {
+  repeated ChatMessage messages = 1;
+}
+
+service AIService {
+  rpc Chat(ChatRequest) returns (ChatResponse);
+  rpc GetChatHistory(GetChatHistoryRequest) returns (ChatHistoryResponse);
+}

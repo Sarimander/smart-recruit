@@ -1,0 +1,25 @@
+# Config & secrets — never commit real values
+.env
+.env.*
+!.env.example
+**/.env
+**/.env.*
+!**/.env.example
+config/config.yaml
+**/config/config.yaml
+*.local.yaml
+
+# Go
+bin/
+*.exe
+*.test
+
+# Node
+node_modules/
+dist/
+.DS_Store
+
+# IDE
+.idea/
+.vscode/
+*.swp
